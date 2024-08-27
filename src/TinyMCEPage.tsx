@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
+import tinymce from "tinymce/tinymce"; // Import the core TinyMCE library
 import { Dropdown, Menu, Button } from "antd";
 
 const TinyMCEPage: React.FC = () => {
@@ -10,9 +11,9 @@ const TinyMCEPage: React.FC = () => {
   };
 
   const filePickerCallback = (
-    cb: (url: string, meta: { title: string }) => void,
-    value: string,
-    meta: Record<string, any> // Broaden the type to match the expected type
+    cb: (url: string, meta: { title: string }) => void
+    // value: string,
+    // meta: Record<string, any> // Broaden the type to match the expected type
   ) => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -27,6 +28,7 @@ const TinyMCEPage: React.FC = () => {
         reader.onload = () => {
           const id = "blobid" + new Date().getTime();
           const blobCache = tinymce?.activeEditor?.editorUpload.blobCache;
+
           const base64 = reader.result?.toString().split(",")[1];
           if (blobCache && base64) {
             const blobInfo = blobCache.create(id, file, base64);
@@ -69,7 +71,7 @@ const TinyMCEPage: React.FC = () => {
       <Editor
         apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
         initialValue="<p></p>"
-        onInit={(evt, editor) => {
+        onInit={(editor) => {
           editorRef.current = editor;
         }}
         init={{
