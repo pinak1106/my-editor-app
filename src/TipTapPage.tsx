@@ -389,16 +389,16 @@ const MenuBar = () => {
 };
 
 const extensions = [
-  Color.configure({ types: [TextStyle.name, ListItem.name] }),
-  TextStyle.configure({ types: [ListItem.name] }),
+  Color,
+  TextStyle,
   StarterKit.configure({
     bulletList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false, // TODO : Making this as `false` because marks are not preserved when I try to preserve attrs, awaiting a bit of help
     },
     orderedList: {
       keepMarks: true,
-      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      keepAttributes: false, // TODO : Making this as `false` because marks are not preserved when I try to preserve attrs, awaiting a bit of help
     },
   }),
   TextAlign.configure({
@@ -408,12 +408,15 @@ const extensions = [
   TableRow,
   TableHeader,
   TableCell,
-  Table,
+  Table.configure({
+    resizable: true, // Example of a valid option for Table extension
+  }),
   Document,
   Paragraph,
   Text,
   Image,
   Dropcursor,
+  ListItem,
 ];
 
 const content = `
