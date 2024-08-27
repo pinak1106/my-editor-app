@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import tinymce from "tinymce/tinymce"; // Import the core TinyMCE library
+import tinymce from "tinymce/tinymce";
 import { Dropdown, Menu, Button } from "antd";
 
 const TinyMCEPage: React.FC = () => {
