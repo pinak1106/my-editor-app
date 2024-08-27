@@ -1,0 +1,60 @@
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #ccc;
+  padding: 8px 0;
+}
+
+.toolbar button {
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.toolbar button.is-active {
+  background-color: #f0f0f0;
+}
+
+.editor-content {
+  min-height: 200px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+.editor-container {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.ant-btn {
+  padding: 5px 10px;
+}
+
+.ant-divider-vertical {
+  height: 24px;
+  margin: 0 8px;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
