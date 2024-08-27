@@ -75,7 +75,7 @@ const TinyMCEPage: React.FC = () => {
         }}
         init={{
           height: 500,
-          menubar: true,
+          menubar: "insert format table",
           plugins: [
             "advlist",
             "autolink",
@@ -95,7 +95,6 @@ const TinyMCEPage: React.FC = () => {
             "media",
             "table",
             "emoticons",
-            "help",
           ],
           images_file_types: "jpg,svg,webp",
           file_picker_types: "file image media",
@@ -104,7 +103,7 @@ const TinyMCEPage: React.FC = () => {
           toolbar:
             "undo redo | formatselect | bold italic backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist outdent indent | removeformat | help | image",
+            bullist numlist outdent indent | removeformat | image",
         }}
         onEditorChange={handleEditorChange}
       />
