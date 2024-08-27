@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import tinymce from "tinymce/tinymce";
 import { Dropdown, Menu, Button } from "antd";
 
 const TinyMCEPage: React.FC = () => {
@@ -28,7 +27,6 @@ const TinyMCEPage: React.FC = () => {
         reader.onload = () => {
           const id = "blobid" + new Date().getTime();
           const blobCache = tinymce?.activeEditor?.editorUpload.blobCache;
-
           const base64 = reader.result?.toString().split(",")[1];
           if (blobCache && base64) {
             const blobInfo = blobCache.create(id, file, base64);
