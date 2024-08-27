@@ -68,7 +68,7 @@ const TinyMCEPage: React.FC = () => {
     <div style={{ padding: "20px" }}>
       <h1>TinyMCE Editor</h1>
       <Editor
-        apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+        apiKey={"0woya44o82wt7hn2d1sjq68x2wz4u3i9wsjbhouk24xv8w6v"} // import.meta.env.VITE_TINYMCE_API_KEY
         initialValue="<p></p>"
         onInit={(editor) => {
           editorRef.current = editor;
