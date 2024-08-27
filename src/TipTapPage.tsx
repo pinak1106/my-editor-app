@@ -1,221 +1,441 @@
-import React, { useState } from "react";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { Color } from "@tiptap/extension-color";
+import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
-import Link from "@tiptap/extension-link";
+import Highlight from "@tiptap/extension-highlight";
+import TextAlign from "@tiptap/extension-text-align";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import Document from "@tiptap/extension-document";
+import Dropcursor from "@tiptap/extension-dropcursor";
 import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
-import CharacterCount from "@tiptap/extension-character-count";
-import { Button, Dropdown, Menu, Divider } from "antd";
-import {
-  BoldOutlined,
-  ItalicOutlined,
-  UnderlineOutlined,
-  StrikethroughOutlined,
-  OrderedListOutlined,
-  UnorderedListOutlined,
-  LinkOutlined,
-  PictureOutlined,
-  CodeOutlined,
-  DownOutlined,
-} from "@ant-design/icons";
-const limit = 100;
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
+import { EditorProvider, useCurrentEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import React from "react";
 
-const TipTapEditor: React.FC = () => {
-  const [charCount, setCharCount] = useState(0);
+const MenuBar = () => {
+  const { editor } = useCurrentEditor();
 
-  const editor = useEditor({
-    content: "<p>Example Text</p>",
-    autofocus: true,
-    extensions: [
-      StarterKit,
-      TextStyle,
-      Link,
-      Image,
-      Placeholder.configure({
-        placeholder: `Body (Character limit: ${limit})`,
-      }),
-      CharacterCount.configure({
-        limit,
-      }),
-    ],
-    onUpdate({ editor }) {
-      const text = editor.getText();
-      if (text.length > limit) {
-        editor.commands.undo();
-      } else {
-        setCharCount(text.length);
-      }
-    },
-  });
-
-  if (!editor) {
-    return null;
-  }
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && charCount < limit) {
+  const addImage = (event: { target: { files: any[] } }) => {
+    const file = event.target.files[0];
+    if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const src = reader.result as string;
-        editor.chain().focus().setImage({ src }).run();
+        const src = reader.result;
+        editor?.chain().focus().setImage({ src }).run();
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item
-        key="1"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={charCount >= limit}
-      >
-        <BoldOutlined /> Bold
-      </Menu.Item>
-      <Menu.Item
-        key="2"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={charCount >= limit}
-      >
-        <ItalicOutlined /> Italic
-      </Menu.Item>
-      <Menu.Item
-        key="3"
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        disabled={charCount >= limit}
-      >
-        <UnderlineOutlined /> Underline
-      </Menu.Item>
-    </Menu>
-  );
-
-  const isLimitReached = charCount >= limit;
+  if (!editor) {
+    return null;
+  }
 
   return (
-    <div
-      style={{
-        border: "1px solid #d9d9d9",
-        borderRadius: "4px",
-        padding: "10px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-start",
-          marginBottom: "8px",
-          gap: "8px",
-          flexWrap: "wrap",
-        }}
-      >
-        <Dropdown overlay={menu} trigger={["click"]} disabled={isLimitReached}>
-          <Button>
-            Normal text <DownOutlined />
-          </Button>
-        </Dropdown>
-        <Button
-          icon={<BoldOutlined />}
+    <div className="control-group">
+      <div className="button-group">
+        <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          type={editor.isActive("bold") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<ItalicOutlined />}
+          disabled={!editor.can().chain().focus().toggleBold().run()}
+          className={editor.isActive("bold") ? "is-active" : ""}
+        >
+          Bold
+        </button>
+        <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          type={editor.isActive("italic") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<UnderlineOutlined />}
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          type={editor.isActive("underline") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<StrikethroughOutlined />}
+          disabled={!editor.can().chain().focus().toggleItalic().run()}
+          className={editor.isActive("italic") ? "is-active" : ""}
+        >
+          Italic
+        </button>
+        <button
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          type={editor.isActive("strike") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Divider type="vertical" />
-        <Button
-          icon={<OrderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          type={editor.isActive("orderedList") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<UnorderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          type={editor.isActive("bulletList") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Divider type="vertical" />
-        <Button
-          icon={<LinkOutlined />}
-          onClick={() => {
-            const url = prompt("Enter URL");
-            if (url && charCount < limit) {
-              editor.chain().focus().setLink({ href: url }).run();
-            }
-          }}
-          type={editor.isActive("link") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <input
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          id="upload-image"
-          onChange={handleImageUpload}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<PictureOutlined />}
-          onClick={() => {
-            if (!isLimitReached) {
-              document.getElementById("upload-image")?.click();
-            }
-          }}
-          type={editor.isActive("image") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-        <Button
-          icon={<CodeOutlined />}
+          disabled={!editor.can().chain().focus().toggleStrike().run()}
+          className={editor.isActive("strike") ? "is-active" : ""}
+        >
+          Strike
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+          className={editor.isActive("highlight") ? "is-active" : ""}
+        >
+          Highlight
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
+          className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
+        >
+          Left
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+          className={
+            editor.isActive({ textAlign: "center" }) ? "is-active" : ""
+          }
+        >
+          Center
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
+        >
+          Right
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+          className={
+            editor.isActive({ textAlign: "justify" }) ? "is-active" : ""
+          }
+        >
+          Justify
+        </button>
+        <button
           onClick={() => editor.chain().focus().toggleCode().run()}
-          type={editor.isActive("code") ? "primary" : "default"}
-          disabled={isLimitReached}
-        />
-      </div>
-      <EditorContent
-        editor={editor}
-        style={{
-          minHeight: "150px",
-          padding: "10px",
-          border: "1px solid #f0f0f0",
-          borderRadius: "4px",
-          backgroundColor: "#ffffff",
-          cursor: isLimitReached ? "not-allowed" : "text",
-        }}
-      />
-      <div
-        style={{
-          marginTop: "10px",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* <span style={{ color: isLimitReached ? "red" : "inherit" }}>
-          Characters: {charCount}/{limit}
-        </span> */}
-        {editor.storage.characterCount.characters()} / {limit} characters
-        {/* <br />
-        {editor.storage.characterCount.words()} words */}
+          disabled={!editor.can().chain().focus().toggleCode().run()}
+          className={editor.isActive("code") ? "is-active" : ""}
+        >
+          Code
+        </button>
+        <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
+          Clear marks
+        </button>
+        <button onClick={() => editor.chain().focus().clearNodes().run()}>
+          Clear nodes
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setParagraph().run()}
+          className={editor.isActive("paragraph") ? "is-active" : ""}
+        >
+          Paragraph
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 1 }) ? "is-active" : ""
+          }
+        >
+          H1
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 2 }) ? "is-active" : ""
+          }
+        >
+          H2
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 3 }) ? "is-active" : ""
+          }
+        >
+          H3
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 4 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 4 }) ? "is-active" : ""
+          }
+        >
+          H4
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 5 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 5 }) ? "is-active" : ""
+          }
+        >
+          H5
+        </button>
+        <button
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 6 }).run()
+          }
+          className={
+            editor.isActive("heading", { level: 6 }) ? "is-active" : ""
+          }
+        >
+          H6
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={editor.isActive("bulletList") ? "is-active" : ""}
+        >
+          Bullet list
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={editor.isActive("orderedList") ? "is-active" : ""}
+        >
+          Ordered list
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={editor.isActive("codeBlock") ? "is-active" : ""}
+        >
+          Code block
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={editor.isActive("blockquote") ? "is-active" : ""}
+        >
+          Blockquote
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        >
+          Horizontal rule
+        </button>
+        <button onClick={() => editor.chain().focus().setHardBreak().run()}>
+          Hard break
+        </button>
+        <button
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().chain().focus().undo().run()}
+        >
+          Undo
+        </button>
+        <button
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().chain().focus().redo().run()}
+        >
+          Redo
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setColor("#958DF1").run()}
+          className={
+            editor.isActive("textStyle", { color: "#958DF1" })
+              ? "is-active"
+              : ""
+          }
+        >
+          Purple
+        </button>
+        <button
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+              .run()
+          }
+        >
+          Insert table
+        </button>
+        <button
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertContent(tableHTML, {
+                parseOptions: {
+                  preserveWhitespace: false,
+                },
+              })
+              .run()
+          }
+        >
+          Insert HTML table
+        </button>
+        <button
+          onClick={() => editor.chain().focus().addColumnBefore().run()}
+          disabled={!editor.can().addColumnBefore()}
+        >
+          Add column before
+        </button>
+        <button
+          onClick={() => editor.chain().focus().addColumnAfter().run()}
+          disabled={!editor.can().addColumnAfter()}
+        >
+          Add column after
+        </button>
+        <button
+          onClick={() => editor.chain().focus().deleteColumn().run()}
+          disabled={!editor.can().deleteColumn()}
+        >
+          Delete column
+        </button>
+        <button
+          onClick={() => editor.chain().focus().addRowBefore().run()}
+          disabled={!editor.can().addRowBefore()}
+        >
+          Add row before
+        </button>
+        <button
+          onClick={() => editor.chain().focus().addRowAfter().run()}
+          disabled={!editor.can().addRowAfter()}
+        >
+          Add row after
+        </button>
+        <button
+          onClick={() => editor.chain().focus().deleteRow().run()}
+          disabled={!editor.can().deleteRow()}
+        >
+          Delete row
+        </button>
+        <button
+          onClick={() => editor.chain().focus().deleteTable().run()}
+          disabled={!editor.can().deleteTable()}
+        >
+          Delete table
+        </button>
+        <button
+          onClick={() => editor.chain().focus().mergeCells().run()}
+          disabled={!editor.can().mergeCells()}
+        >
+          Merge cells
+        </button>
+        <button
+          onClick={() => editor.chain().focus().splitCell().run()}
+          disabled={!editor.can().splitCell()}
+        >
+          Split cell
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleHeaderColumn().run()}
+          disabled={!editor.can().toggleHeaderColumn()}
+        >
+          ToggleHeaderColumn
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+          disabled={!editor.can().toggleHeaderRow()}
+        >
+          Toggle header row
+        </button>
+        <button
+          onClick={() => editor.chain().focus().toggleHeaderCell().run()}
+          disabled={!editor.can().toggleHeaderCell()}
+        >
+          Toggle header cell
+        </button>
+        <button
+          onClick={() => editor.chain().focus().mergeOrSplit().run()}
+          disabled={!editor.can().mergeOrSplit()}
+        >
+          Merge or split
+        </button>
+        <button
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .setCellAttribute("backgroundColor", "#FAF594")
+              .run()
+          }
+          disabled={
+            !editor.can().setCellAttribute("backgroundColor", "#FAF594")
+          }
+        >
+          Set cell attribute
+        </button>
+        <button
+          onClick={() => editor.chain().focus().fixTables().run()}
+          disabled={!editor.can().fixTables()}
+        >
+          Fix tables
+        </button>
+        <button
+          onClick={() => editor.chain().focus().goToNextCell().run()}
+          disabled={!editor.can().goToNextCell()}
+        >
+          Go to next cell
+        </button>
+        <button
+          onClick={() => editor.chain().focus().goToPreviousCell().run()}
+          disabled={!editor.can().goToPreviousCell()}
+        >
+          Go to previous cell
+        </button>
+        <button onClick={addImage}>Add image from URL</button>
       </div>
     </div>
   );
 };
 
-export default TipTapEditor;
+const extensions = [
+  Color.configure({ types: [TextStyle.name, ListItem.name] }),
+  TextStyle.configure({ types: [ListItem.name] }),
+  StarterKit.configure({
+    bulletList: {
+      keepMarks: true,
+      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+    },
+    orderedList: {
+      keepMarks: true,
+      keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+    },
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+  }),
+  Highlight,
+  TableRow,
+  TableHeader,
+  TableCell,
+  Table,
+  Document,
+  Paragraph,
+  Text,
+  Image,
+  Dropcursor,
+];
+
+const content = `
+<h2>
+  Hi there,
+</h2>
+<p>
+  this is a <em>basic</em> example of <strong>Tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
+</p>
+<ul>
+  <li>
+    That’s a bullet list with one …
+  </li>
+  <li>
+    … or two list items.
+  </li>
+</ul>
+<p>
+  Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
+</p>
+<pre><code class="language-css">body {
+  display: none;
+}</code></pre>
+<p>
+  I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
+</p>
+<blockquote>
+  Wow, that’s amazing. Good work, boy! 👏
+  <br />
+  — Mom
+</blockquote>
+`;
+
+export default () => {
+  return (
+    <>
+      <h1>TipTap Editor</h1>
+      <EditorProvider
+        slotBefore={<MenuBar />}
+        extensions={extensions}
+        content={content}
+      ></EditorProvider>
+    </>
+  );
+};

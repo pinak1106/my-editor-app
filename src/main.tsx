@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import App from "./App";
 import "./index.css";
+import "./styles.scss";
+import "./style.scss";
 import TinyMCEPage from "./TinyMCEPage";
 import TipTapPage from "./TipTapPage";
 
