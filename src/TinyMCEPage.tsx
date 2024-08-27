@@ -26,6 +26,7 @@ const TinyMCEPage: React.FC = () => {
         const reader = new FileReader();
         reader.onload = () => {
           const id = "blobid" + new Date().getTime();
+          // @ts-ignore
           const blobCache = tinymce?.activeEditor?.editorUpload.blobCache;
           const base64 = reader.result?.toString().split(",")[1];
           if (blobCache && base64) {
